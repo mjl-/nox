@@ -1,0 +1,68 @@
+Nox uses noise protocol variant Noise_XX_25519_ChaChaPoly_BLAKE2b, and defines a
+simple framing format on top. Noise is family of protocols for (authenticated)
+key exchange based on DH, see https://noiseprotocol.org/. Nox runs on top of a
+potentially insecure streaming transport protocol like TCP. Communication in nox
+is bidirectional, both sides can write data, which the other can read.
+
+The initiator (client) starts the conversation by writing a hello message,
+consisting of:
+
+- 2 bytes (big endian) for the size of a string with supported protocols.
+- "size" bytes containing an ascii string with a comma-separated list of
+  supported protocols. Currently "nox0".
+
+The responder (server) must respond with a list of supported protocols, even
+those not mentioned by the client, in order of preference. The first protocol
+will be used. If the client does not support the first protocol, the connection
+fails.
+
+The concatenation of the initiator hello message and the responder hello message
+(including their sizes) must be fed into noise as prologue.
+
+The noise XX handshake is performed, see https://noiseprotocol.org/noise.html.
+
+	-> e
+	<- e, ee, s, es
+	-> s, se
+
+The first message from initiator ("client") to responder ("server") is 32 bytes:
+32 for the cleartext ephemeral public key, 0 for the cleartext empty payload.
+
+The second message from responder to initiator is 96 bytes: 32 for the cleartext
+ephemeral public key, 48 for the encrypted static public key, 16 for the
+encrypted empty payload. At this moment the client knows the responder's static
+public key and should verify it is trusted. If it is not trusted, the client
+should abort the handshake and close the connection.
+
+The third message from initiator to responder is 64 bytes: 48 for the encrypted
+static public key, 16 for the encrypted empty payload. At this moment the
+responder knows the initiator's static public key and should verify it is
+trusted. If not, the server should close the connection.
+
+After this noise handshake, both parties are mutually authenticated and start
+the transport phase during which they send each other data in the form of
+"write" messages.
+
+A write consists of two messages: A "size message" followed by a "data message".
+Each is separately encrypted+authenticated on the wire. The encrypted bytes are
+the same size as the plaintext, but a 16-byte authentication tag follows.
+
+The size message is always 4 bytes as plaintext:
+- 2 bytes (big endian) for the content size in the "data message".
+- 2 bytes (big endian) for the padding size in the "data message".
+
+The "data message" contains just the data bytes in plaintext, and padding. Random
+padding should be added to hide the exact size of the write.
+
+The maximum total size of a plaintext data message (content + padding) is
+NoiseMaxMsgSize (64k-1) minus 16 bytes for the authenticator. 
+
+A write with a content size of zero indicates the end of that direction. No
+further writes in that direction are allowed. The other side may still send
+writes until its first and only zero-sized write.
+
+Not part of nox:
+- Crypto method negotiation.
+- Error messages.
+- Rekeying.
+- Virtual hosting. One server port, one key.

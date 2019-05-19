@@ -1,0 +1,4 @@
+.nox/
+/cmd/nox/nox
+/cmd/noxproxy/noxproxy
+/cmd/noxhttpget/noxhttpget
