@@ -45,8 +45,7 @@ func (rt *NoxRoundTripper) RoundTrip(req *http.Request) (resp *http.Response, re
 	noxConfig := &nox.Config{}
 	u := *req.URL
 	u.Scheme = "http"
-	var err error
-	err = nox.ParseAddress(u.Host, noxConfig)
+	err := nox.ParseAddress(u.Host, noxConfig)
 	if err != nil {
 		return nil, err
 	}
