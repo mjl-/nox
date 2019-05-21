@@ -343,7 +343,7 @@ func (c *Conn) ensureHandshake() error {
 	return c.handshake.err
 }
 
-// Handshake performs the protocol handshake: first version negotation, then noise
+// Handshake performs the protocol handshake: first version negotiation, then noise
 // handshake. Read, Write or RemoteAddress on a new connection ensures a handshake
 // is done.
 //
