@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"io"
 	mathrand "math/rand"
 	"net"
@@ -15,7 +16,6 @@ import (
 	"time"
 
 	"github.com/flynn/noise"
-	"golang.org/x/xerrors"
 )
 
 const (
@@ -200,7 +200,7 @@ func Dial(network, address string, config *Config) (*Conn, error) {
 
 	err := ParseAddress(address, config)
 	if err != nil {
-		return nil, xerrors.Errorf("parsing address: %w", err)
+		return nil, fmt.Errorf("parsing address: %w", err)
 	}
 
 	conn, err := net.Dial(network, config.Address)
@@ -244,7 +244,7 @@ func Listen(network, address string, config *Config) (net.Listener, error) {
 	}
 	err := ParseAddress(address, config)
 	if err != nil {
-		return nil, xerrors.Errorf("parsing address: %w", err)
+		return nil, fmt.Errorf("parsing address: %w", err)
 	}
 
 	l, err := net.Listen(network, config.Address)
@@ -317,7 +317,7 @@ func newConn(conn net.Conn, config *Config, isInitiator bool, shake bool) (*Conn
 	if shake {
 		err := c.Handshake()
 		if err != nil {
-			return nil, xerrors.Errorf("handshake: %w", err)
+			return nil, fmt.Errorf("handshake: %w", err)
 		}
 	}
 	return c, nil
@@ -328,7 +328,7 @@ func newConn(conn net.Conn, config *Config, isInitiator bool, shake bool) (*Conn
 func (c *Conn) RemoteStatic() (PublicKey, error) {
 	err := c.ensureHandshake()
 	if err != nil {
-		return nil, xerrors.Errorf("handshake: %w", err)
+		return nil, fmt.Errorf("handshake: %w", err)
 	}
 	return PublicKey(c.state.PeerStatic()), nil
 }
@@ -672,7 +672,7 @@ func (c *Conn) CloseWrite() error {
 	}
 	_, err := c.write([]byte{})
 	if err != nil {
-		return xerrors.Errorf("writing eof message: %w", err)
+		return fmt.Errorf("writing eof message: %w", err)
 	}
 
 	c.writer.err = ErrConnClosed

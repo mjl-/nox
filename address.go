@@ -2,6 +2,7 @@ package nox
 
 import (
 	"encoding/base64"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/flynn/noise"
 	"golang.org/x/crypto/curve25519"
-	"golang.org/x/xerrors"
 )
 
 var newlyGenerated struct {
@@ -122,7 +122,7 @@ func loadPrivate(spec string, config *Config) error {
 		}
 		key, err := readNearestPrivateKeyFile()
 		if err != nil {
-			return xerrors.Errorf("reading nearest private key in file system: %w", err)
+			return fmt.Errorf("reading nearest private key in file system: %w", err)
 		}
 		config.LocalStaticPrivateKey = key
 	case "":

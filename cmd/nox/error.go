@@ -1,7 +1,7 @@
 package main
 
 import (
-	"golang.org/x/xerrors"
+	"fmt"
 )
 
 func errorHandler(fn func(error)) (func(error, string), func()) {
@@ -11,7 +11,7 @@ func errorHandler(fn func(error)) (func(error, string), func()) {
 
 	check := func(err error, msg string) {
 		if err != nil {
-			err = xerrors.Errorf("%s: %w", msg, err)
+			err = fmt.Errorf("%s: %w", msg, err)
 			panic(&localError{err})
 		}
 	}

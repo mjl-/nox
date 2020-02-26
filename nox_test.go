@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/flynn/noise"
-	"golang.org/x/xerrors"
 )
 
 func check(t *testing.T, got, expect error, action string) {
@@ -19,7 +18,7 @@ func check(t *testing.T, got, expect error, action string) {
 	if got == expect {
 		return
 	}
-	if expect == nil || expect == io.EOF || !xerrors.Is(got, expect) {
+	if expect == nil || expect == io.EOF || !errors.Is(got, expect) {
 		t.Fatalf("%s: got %v, expected %v", action, got, expect)
 	}
 }

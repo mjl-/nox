@@ -1,9 +1,8 @@
 package nox
 
 import (
+	"errors"
 	"fmt"
-
-	"golang.org/x/xerrors"
 )
 
 func errorHandler(fn func(error)) (func(error, string), func()) {
@@ -13,7 +12,7 @@ func errorHandler(fn func(error)) (func(error, string), func()) {
 
 	check := func(err error, msg string) {
 		if err != nil {
-			err = xerrors.Errorf("%s: %w", msg, err)
+			err = fmt.Errorf("%s: %w", msg, err)
 			panic(&localError{err})
 		}
 	}
@@ -31,7 +30,7 @@ func errorHandler(fn func(error)) (func(error, string), func()) {
 	return check, handle
 }
 
-// Remove when xerrors supports "%w" in arbitrary location in the formatting
+// Remove when errors supports "%w" in arbitrary location in the formatting
 // string. At the time of writing, it only allows it at the end.
 type prefixErr struct {
 	err    error
@@ -61,7 +60,7 @@ func (e *wrapErr) Error() string {
 }
 
 func (e *wrapErr) Is(err error) bool {
-	return xerrors.Is(e.err, err)
+	return errors.Is(e.err, err)
 }
 
 func (e *wrapErr) Unwrap() error {
