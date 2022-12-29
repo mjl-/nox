@@ -612,8 +612,9 @@ func (c *Conn) write(buf []byte) (written int, rerr error) {
 	defer atomic.StoreUint32(&c.writer.writing, 0)
 
 	write := func(out []byte) {
-		xout := c.enc.Encrypt(nil, nil, out)
-		_, err := c.writer.out.Write(xout)
+		xout, err := c.enc.Encrypt(nil, nil, out)
+		lcheck(err, "encrypt")
+		_, err = c.writer.out.Write(xout)
 		lcheck(err, "writing")
 	}
 

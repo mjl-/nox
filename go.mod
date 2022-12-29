@@ -1,10 +1,10 @@
 module github.com/mjl-/nox
 
-go 1.12
+go 1.18
 
 require (
-	github.com/flynn/noise v0.0.0-20180327030543-2492fe189ae6
-	github.com/kr/pretty v0.1.0 // indirect
-	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	github.com/flynn/noise v1.0.0
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 )
+
+require golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
